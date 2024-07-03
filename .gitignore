@@ -1,0 +1,34 @@
+# Ignore IDE files
+.vscode
+.idea
+**/.DS_Store
+
+# Ignore Python cache and prebuilt things
+.cache
+__pycache__
+*.egg-info
+*.pyc
+build
+_build
+dist
+.pytest_cache
+
+# Ignore the Environment
+env
+.tox
+venv
+.venv
+.python-version
+
+# VSCode
+.vscode
+*.code-workspace
+
+# Ignore pypirc secrets
+.pypirc
+
+# ignore .log files
+*.log
+
+# ignore working notes and todos
+TODO.md

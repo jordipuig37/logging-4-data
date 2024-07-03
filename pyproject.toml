@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "log4data"
+version = "0.1.0"
+authors = [
+  { name="Jordi Puig Rabat", email="jordipuig37@gmail.com" },
+]
+description = "Logger helper functions"
+readme = "README.md"
+requires-python = ">=3.8"
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.urls]
+Homepage = "https://github.com/jordipuig37/logging-4-data"
+Issues = "https://github.com/jordipuig37/logging-4-data/issues"
