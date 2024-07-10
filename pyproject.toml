@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "log4data"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
   { name="Jordi Puig Rabat", email="jordipuig37@gmail.com" },
 ]
-description = "Logger helper functions"
+description = "Helper library to configure logging for python"
 readme = "README.md"
 requires-python = ">=3.8"
 

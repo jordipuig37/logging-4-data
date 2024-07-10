@@ -7,6 +7,7 @@ To use, simply 'import log4data as l4g' and log away!
 import argparse
 import datetime as dt
 import logging as lg
+import os
 
 from functools import wraps
 
@@ -22,7 +23,10 @@ __all__ = [
     "DEFAULT_LOG_FORMAT",
     "set_log_args",
     "setup_logger",
-    "inject_logger"
+    "setup_logger_with_file"
+    "default_setup_logger",
+    "inject_logger",
+    "inject_named_logger"
 ]
 
 
@@ -108,10 +112,41 @@ def setup_logger(args: argparse.Namespace):
     file_name = args.log_file_name.split(".")[0] \
         + "_" + today + "." + args.log_file_name.split(".")[1]
 
+    _create_log_folder(file_name)
+
     lg.basicConfig(
         level=session_level,
         filename=file_name,
         format=args.log_format
+    )
+
+
+def setup_logger_with_file(log_file_name: str, dynamic_date: bool = True):
+    """
+    Configures the logging.basicConfig() taking into account the log_file_name.
+    Level is set to INFO and format is set to the default:
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+    Args:
+        log_file_name (str): sets the file where logs will be written to.
+        dynamic_date (bool): if True the name will be altered to add the date
+            and result in a name like this: <log_file_name>_<YYYYMMDD>.log
+    """
+    session_level = lg.INFO
+
+    file_name = log_file_name
+    if dynamic_date:
+        # dynamically generate the filename as <log_file_name>_<YYYYMMDD>.log
+        today = dt.datetime.now().strftime("%Y%m%d")
+        file_name = log_file_name.split(".")[0] \
+            + "_" + today + "." + log_file_name.split(".")[1]
+
+    _create_log_folder(file_name)
+
+    lg.basicConfig(
+        level=session_level,
+        filename=file_name,
+        format=DEFAULT_LOG_FORMAT
     )
 
 
@@ -136,8 +171,8 @@ def inject_logger(func: Callable[..., Any]) -> Callable[..., Any]:
 
     This decorator modifies the function by adding a `logger` parameter
     automatically before calling the function. It retrieves a logger instance
-    using the function's name, which helps in tracking which function logged
-    the messages.
+    using the function's module and name, which helps in tracking which
+    function logged the messages.
 
     Note:
         The decorated function must be designed to accept a 'logger' keyword
@@ -154,7 +189,7 @@ def inject_logger(func: Callable[..., Any]) -> Callable[..., Any]:
 
     Example:
     ```python
-        @inject_logger
+        @inject_logger()
         def process_data(data, logger=None):
             logger.info("Processing data")
             pass
@@ -163,10 +198,67 @@ def inject_logger(func: Callable[..., Any]) -> Callable[..., Any]:
         process_data(data)
     ```
     """
-    logger = lg.getLogger(func.__name__)
+    logger_name = f"{func.__module__}.{func.__name__}"
+    logger = lg.getLogger(logger_name)
 
     @wraps(func)
     def wrapper(*args, **kwargs):
         return func(*args, logger=logger, **kwargs)
 
     return wrapper
+
+
+def inject_named_logger(logger_name: Optional[str] = None):
+    """
+    A decorator that injects a logger into the decorated function, with a given
+    name.
+
+    This decorator modifies the function by adding a `logger` parameter
+    automatically before calling the function. It retrieves a logger instance
+    using the passed argument logger_name, which helps in tracking.
+
+    Note:
+        The decorated function must be designed to accept a 'logger' keyword
+        argument. This implementation does not handle the case where the
+        function already has a 'logger' keyword argument or uses *args and
+        **kwargs in a way that conflicts with the automatic injection of the
+        logger.
+
+    Args:
+        logger_name (Optional[str]): if logger_name is not None, the logger
+            will have this name. Else the name will be root.
+
+    Returns:
+        Callable: A wrapper function that adds the logger to `func`s arguments.
+
+    Example:
+    ```python
+        @inject_named_logger("my_logger")
+        def process_data(data, logger=None):
+            logger.info("Processing data")
+            pass
+
+        # call the function without passing a logger
+        process_data(data)
+    ```
+    """
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+        logger = lg.getLogger(logger_name)
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            return func(*args, logger=logger, **kwargs)
+
+        return wrapper
+    return decorator
+
+
+def _create_log_folder(file_name: str):
+    """This function checks if the log file name will be in a folder and wether
+    that folder exists, and creates the folder in the case it does not using
+    os.mkdirs()
+    """
+    assert file_name.endswith(".log")
+    if "/" in file_name:
+        log_folder = "/".join(file_name.split[:-1])
+        os.mkdirs(log_folder, exist_ok=True)
