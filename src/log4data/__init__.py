@@ -8,6 +8,7 @@ import argparse
 import datetime as dt
 import logging as lg
 import os
+import pathlib
 
 from functools import wraps
 
@@ -21,10 +22,10 @@ from typing import (
 
 __all__ = [
     "DEFAULT_LOG_FORMAT",
-    "set_log_args",
+    "setup_log_args",
     "setup_logger",
     "setup_logger_with_file",
-    "default_setup_logger",
+    "setup_default_logger",
     "inject_logger",
     "inject_named_logger"
 ]
@@ -33,7 +34,7 @@ __all__ = [
 DEFAULT_LOG_FORMAT: Final = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"  # noqa: E501
 
 
-def set_log_args(
+def setup_log_args(
     parser: Optional[argparse.ArgumentParser] = None,
     return_args: bool = False
 ) -> Optional[argparse.Namespace]:
@@ -163,7 +164,7 @@ def setup_logger_with_file(log_file_name: str, dynamic_date: bool = True):
     )
 
 
-def default_setup_logger():
+def setup_default_logger():
     """Quick and easy way to setup the logging.basicConfig
 
     level: ``lg.INFO``
@@ -283,9 +284,8 @@ def inject_named_logger(logger_name: Optional[str] = None):
 def _create_log_folder(file_name: str):
     """This function checks if the log file name will be in a folder and wether
     that folder exists, and creates the folder in the case it does not using
-    os.mkdirs()
+    os.makedirs()
     """
     assert file_name.endswith(".log")
-    if "/" in file_name:
-        log_folder = "/".join(file_name.split[:-1])
-        os.mkdirs(log_folder, exist_ok=True)
+    log_folder = pathlib.Path(file_name).parent
+    os.makedirs(log_folder, exist_ok=True)
