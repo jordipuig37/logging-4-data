@@ -98,15 +98,26 @@ class MonitorLogger(lg.Logger):
 
     Attributes:
         name (str): The name of the logger.
-        level (int): The threshold for this logger. Logging messages which are less severe
-                     than `level` will be ignored.
+        level (int): The threshold for this logger. Logging messages which are
+            less severe than `level` will be ignored.
     """
     def __init__(self, name, level=lg.NOTSET):
         super().__init__(name, level)
 
-    def _log(self, level, msg, args, exc_info=None, extra=None, stack_info=False, stacklevel=1, key=None, value=None):
+    def _log(
+            self,
+            level,
+            msg,
+            args,
+            exc_info=None,
+            extra=None,
+            stack_info=False,
+            stacklevel=1,
+            key=None,
+            value=None):
         # Extend the 'extra' dictionary to include 'key' and 'value'
-        assert key is not None and key!="", "You can't pass an empty or null key"
+        assert key is not None and key != "", \
+            "You can't pass an empty or null key"
         if extra is None:
             extra = dict()
         extra['key'] = key
@@ -162,7 +173,7 @@ def setup_default_monitor(
     """
     monitor_name = DEFAULT_MONITOR_NAME
     monitor_file = DEFAULT_MONITOR_FILE
-    
+
     if monitor_name not in lg.Logger.manager.loggerDict:
         _ = _build_monitor_logger(
             monitor_name,
@@ -205,7 +216,7 @@ def setup_monitor(
         like this: ``<monitor_file>_<YYYYMMDD>.log``
     """
     if monitor_name not in lg.Logger.manager.loggerDict:
-        monitor = _build_monitor_logger(
+        _ = _build_monitor_logger(
             monitor_name,
             level,
             monitor_file,
@@ -218,6 +229,7 @@ def setup_monitor(
 
     if return_monitor:
         return lg.getLogger(monitor_name)
+
 
 def setup_monitor_from_args(
         args: argparse.Namespace,
@@ -234,7 +246,7 @@ def setup_monitor_from_args(
             args.add_dynamic_date
         )
     else:
-       warnings.warn(
+        warnings.warn(
             f"Setting up an already created Logger with name {args.monitor_name}",  # noqa: E501
             UserWarning, stacklevel=2)
 
@@ -254,8 +266,8 @@ def inject_default_monitor(func: Callable[..., Any]) -> Callable[..., Any]:
     ----
     The decorated function must be designed to accept a 'monitor' keyword
     argument. This implementation does not handle the case where the
-    function already has a 'monitor' keyword argument or uses \*args and
-    \*\*kwargs in a way that conflicts with the automatic injection of the
+    function already has a 'monitor' keyword argument or uses *args and
+    **kwargs in a way that conflicts with the automatic injection of the
     monitor.
 
     Args
@@ -266,7 +278,7 @@ def inject_default_monitor(func: Callable[..., Any]) -> Callable[..., Any]:
     Returns
     -------
     Callable
-        A wrapper function that adds the monitor to ``func``'s 
+        A wrapper function that adds the monitor to ``func``'s
         arguments.
 
     Example:
@@ -308,8 +320,8 @@ def inject_named_monitor(monitor_name: str):
     -----
     1. The decorated function must be designed to accept a 'monitor' keyword
       argument. This implementation does not handle the case where the
-      function already has a 'monitor' keyword argument or uses \*args and
-      \*\*kwargs in a way that conflicts with the automatic injection of the
+      function already has a 'monitor' keyword argument or uses *args and
+      **kwargs in a way that conflicts with the automatic injection of the
       logger.
     2. The monitor must be initialized before injecting it. Else, the logger
        returned will be a base lg.Logger object with the default configuration.

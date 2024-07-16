@@ -5,10 +5,7 @@ To use, simply 'import log4data as l4g' and log away!
 """
 
 import argparse
-import datetime as dt
 import logging as lg
-import os
-import pathlib
 
 from functools import wraps
 
@@ -155,7 +152,7 @@ def setup_logger_from_args(args: argparse.Namespace):
 
 
 def setup_logger(
-        level: int= lg.INFO,
+        level: int = lg.INFO,
         log_file_name: str = "exit.log",
         log_format: str = DEFAULT_LOG_FORMAT,
         dynamic_date: bool = True):
@@ -212,8 +209,8 @@ def inject_logger(func: Callable[..., Any]) -> Callable[..., Any]:
     ----
     The decorated function must be designed to accept a 'logger' keyword
     argument. This implementation does not handle the case where the
-    function already has a 'logger' keyword argument or uses \*args and
-    \*\*kwargs in a way that conflicts with the automatic injection of the
+    function already has a 'logger' keyword argument or uses *args and
+    **kwargs in a way that conflicts with the automatic injection of the
     logger.
 
     Args
@@ -224,8 +221,7 @@ def inject_logger(func: Callable[..., Any]) -> Callable[..., Any]:
     Returns
     -------
     Callable
-        A wrapper function that adds the logger to ``func``'s 
-        arguments.
+        A wrapper function that adds the logger to ``func``'s arguments.
 
     Example:
         .. code-block:: python
@@ -262,8 +258,8 @@ def inject_named_logger(logger_name: Optional[str] = None):
     ----
     The decorated function must be designed to accept a 'logger' keyword
     argument. This implementation does not handle the case where the
-    function already has a 'logger' keyword argument or uses \*args and
-    \*\*kwargs in a way that conflicts with the automatic injection of the
+    function already has a 'logger' keyword argument or uses *args and
+    **kwargs in a way that conflicts with the automatic injection of the
     logger.
 
     Parameters
