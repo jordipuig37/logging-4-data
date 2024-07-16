@@ -40,9 +40,24 @@ def parse_date_from_filename(filename: str) -> Optional[dt.datetime]:
     """Extract the date part from the filename, assuming filename format is
     <filename>_<YYYYMMDD>.log
     """
-    date_part = filename.stem.split('_')[-1]  # filename.stem gives the filename without the extension
+    date_part = filename.stem.split('_')[-1]
     try:
         # Convert the date part to a datetime object
         return dt.datetime.strptime(date_part, '%Y%m%d')
     except ValueError:
         return None
+
+
+def delete_old_log_files(log_dir: str = "logs", older_than: int = 30):
+    """Deletes all log files in the specified directory that are older than
+    the specified number of days.
+    """
+    log_path = pathlib.Path(log_dir)
+    cutoff_date = dt.datetime.now() - dt.timedelta(days=older_than)
+
+    # Loop through all files in the directory
+    for file in log_path.iterdir():
+        if file.is_file() and file.suffix == '.log' and \
+           parse_date_from_filename(file) is not None and \
+           parse_date_from_filename(file) < cutoff_date:
+            file.unlink()
