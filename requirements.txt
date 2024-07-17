@@ -1,0 +1,7 @@
+build
+flake8
+mypy
+pytest
+twine
+sphinx
+pandas
