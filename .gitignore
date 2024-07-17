@@ -12,6 +12,7 @@ build
 _build
 dist
 .pytest_cache
+.mypy_cache
 
 # Ignore the Environment
 env
