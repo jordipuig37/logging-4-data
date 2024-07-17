@@ -83,6 +83,7 @@ def setup_monitoring_args(
     if return_args:  # return the parsed arguments
         args = parser.parse_args()
         return args
+    return None
 
 
 class MonitorLogger(lg.Logger):
@@ -131,14 +132,14 @@ def _build_monitor_logger(
     level: int,
     monitor_file: str,
     dynamic_date: bool = True
-) -> MonitorLogger:
+) -> lg.Logger:
     """Creates a new MonitorLogger object with the configurations passed
     as parameters: name, level, monitor_file and dynamic_date.
     """
     assert logger_name not in lg.Logger.manager.loggerDict, \
         f"Can't create a logger named {logger_name}, it's already created"
     lg.setLoggerClass(MonitorLogger)
-    monitoring_logger: MonitorLogger = lg.getLogger(logger_name)
+    monitoring_logger = lg.getLogger(logger_name)
     lg.setLoggerClass(lg.Logger)  # set it to normal again
 
     monitoring_logger.setLevel(level)
@@ -159,7 +160,7 @@ def _build_monitor_logger(
 
 def setup_default_monitor(
     return_monitor: bool = False
-) -> Optional[MonitorLogger]:
+) -> Optional[lg.Logger]:
     """This function initializes a MonitorLogger with a default configuration.
 
     Optionally, the function returns the monitor object by setting
@@ -173,7 +174,6 @@ def setup_default_monitor(
     """
     monitor_name = DEFAULT_MONITOR_NAME
     monitor_file = DEFAULT_MONITOR_FILE
-
     if monitor_name not in lg.Logger.manager.loggerDict:
         _ = _build_monitor_logger(
             monitor_name,
@@ -187,6 +187,7 @@ def setup_default_monitor(
 
     if return_monitor:
         return lg.getLogger(monitor_name)
+    return None
 
 
 def setup_monitor(
@@ -195,7 +196,7 @@ def setup_monitor(
     monitor_file: str = "logs/monitoring_exit.log",
     dynamic_date: bool = True,
     return_monitor: bool = False
-) -> Optional[MonitorLogger]:
+) -> Optional[lg.Logger]:
     """This function initializes a monitor logger with the given configuration.
 
     Optionally, the function returns the monitor object by setting
@@ -229,12 +230,13 @@ def setup_monitor(
 
     if return_monitor:
         return lg.getLogger(monitor_name)
+    return None
 
 
 def setup_monitor_from_args(
         args: argparse.Namespace,
         return_monitor: bool = False
-) -> Optional[MonitorLogger]:
+) -> Optional[lg.Logger]:
     """Same as setup_monitor but uses an argparse.Namespace to define the
     configuration.
     """
@@ -252,7 +254,7 @@ def setup_monitor_from_args(
 
     if return_monitor:
         return lg.getLogger(args.monitor_name)
-
+    return None
 
 def inject_default_monitor(func: Callable[..., Any]) -> Callable[..., Any]:
     """

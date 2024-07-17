@@ -118,6 +118,7 @@ def setup_log_args(
     if return_args:  # return the parsed arguments
         args = parser.parse_args()
         return args
+    return None
 
 
 def setup_logger_from_args(args: argparse.Namespace):

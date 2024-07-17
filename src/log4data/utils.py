@@ -36,7 +36,7 @@ def _add_dynamic_date(log_file_name: str) -> str:
     return new_log_file_name
 
 
-def parse_date_from_filename(filename: str) -> Optional[dt.datetime]:
+def parse_date_from_filename(filename: pathlib.Path) -> Optional[dt.datetime]:
     """Extract the date part from the filename, assuming filename format is
     <filename>_<YYYYMMDD>.log
     """
@@ -57,7 +57,7 @@ def delete_old_log_files(log_dir: str = "logs", older_than: int = 30):
 
     # Loop through all files in the directory
     for file in log_path.iterdir():
-        if file.is_file() and file.suffix == '.log' and \
-           parse_date_from_filename(file) is not None and \
-           parse_date_from_filename(file) < cutoff_date:
-            file.unlink()
+        if file.is_file() and file.suffix == '.log':
+            parsed_date =  parse_date_from_filename(file)
+            if parsed_date is not None and parsed_date < cutoff_date:
+                file.unlink()
