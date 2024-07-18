@@ -5,9 +5,7 @@ To use, simply 'import log4data as l4g' and log away!
 """
 
 import argparse
-import datetime as dt
 import logging as lg
-import os
 
 from functools import wraps
 
@@ -18,22 +16,47 @@ from typing import (
     Optional
 )
 
+from .monitoring import (
+    setup_monitoring_args,
+    setup_default_monitor,
+    setup_monitor,
+    setup_monitor_from_args,
+    inject_default_monitor,
+    inject_named_monitor
+)
+
+from .utils import (
+    log_levels_lookup,
+    _create_log_folder,
+    _add_dynamic_date,
+    delete_old_log_files
+)
 
 __all__ = [
     "DEFAULT_LOG_FORMAT",
-    "set_log_args",
+    # CORE
+    "setup_log_args",
+    "setup_default_logger",
     "setup_logger",
-    "setup_logger_with_file",
-    "default_setup_logger",
+    "setup_logger_from_args",
     "inject_logger",
-    "inject_named_logger"
+    "inject_named_logger",
+    # MONITORING
+    "setup_monitoring_args",
+    "setup_default_monitor",
+    "setup_monitor",
+    "setup_monitor_from_args",
+    "inject_default_monitor",
+    "inject_named_monitor",
+    # UTILS
+    "delete_old_log_files"
 ]
 
 
 DEFAULT_LOG_FORMAT: Final = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"  # noqa: E501
 
 
-def set_log_args(
+def setup_log_args(
     parser: Optional[argparse.ArgumentParser] = None,
     return_args: bool = False
 ) -> Optional[argparse.Namespace]:
@@ -85,13 +108,20 @@ def set_log_args(
         "-lgfmt", "--log-format",
         type=str, default=DEFAULT_LOG_FORMAT, help="Format for logging."
     )
+    parser.add_argument(
+        "-add", "--add-dynamic-date",
+        type=bool, action="store_true", default=True,
+        help="Add the date to the log file name: <filename>_<YYYYMMDD>.log"
+
+    )
 
     if return_args:  # return the parsed arguments
         args = parser.parse_args()
         return args
+    return None
 
 
-def setup_logger(args: argparse.Namespace):
+def setup_logger_from_args(args: argparse.Namespace):
     """
     Configures the logging.basicConfig() taking into account the arguments
     passed in args.
@@ -101,26 +131,17 @@ def setup_logger(args: argparse.Namespace):
       This name is taken, and the date is added, resulting in:
       ``<args.log_file_name>_<YYYYMMDD>.log``
     + ``args.log_format`` sets the format string for the handler
+    + ``args.add_dynamic_date``
 
     Parameters
     ----------
         args : (argparse.Namespace)
     """
-    if args.log_level.lower() == "debug":
-        session_level = lg.DEBUG
-    elif args.log_level.lower() == "debug":
-        session_level = lg.INFO
-    elif args.log_level.lower() == "warning":
-        session_level = lg.WARNING
-    elif args.log_level.lower() == "error":
-        session_level = lg.ERROR
-    else:
-        session_level = lg.INFO
+    session_level = log_levels_lookup.get(args.log_level.lower(), lg.INFO)
 
-    # dynamically generate the filename as <args.log_file_name>_<YYYYMMDD>.log
-    today = dt.datetime.now().strftime("%Y%m%d")
-    file_name = args.log_file_name.split(".")[0] \
-        + "_" + today + "." + args.log_file_name.split(".")[1]
+    file_name = args.log_file_name
+    if args.add_dynamic_date:
+        file_name = _add_dynamic_date(args.log_file_name)
 
     _create_log_folder(file_name)
 
@@ -131,7 +152,11 @@ def setup_logger(args: argparse.Namespace):
     )
 
 
-def setup_logger_with_file(log_file_name: str, dynamic_date: bool = True):
+def setup_logger(
+        level: int = lg.INFO,
+        log_file_name: str = "exit.log",
+        log_format: str = DEFAULT_LOG_FORMAT,
+        dynamic_date: bool = True):
     """
     Configures the logging.basicConfig() taking into account the log_file_name.
     Level is set to INFO and format is set to the default:
@@ -145,35 +170,29 @@ def setup_logger_with_file(log_file_name: str, dynamic_date: bool = True):
         If True the name will be altered to add the date and result in a name
         like this: ``<log_file_name>_<YYYYMMDD>.log``
     """
-    session_level = lg.INFO
-
-    file_name = log_file_name
     if dynamic_date:
-        # dynamically generate the filename as <log_file_name>_<YYYYMMDD>.log
-        today = dt.datetime.now().strftime("%Y%m%d")
-        file_name = log_file_name.split(".")[0] \
-            + "_" + today + "." + log_file_name.split(".")[1]
+        log_file_name = _add_dynamic_date(log_file_name)
 
-    _create_log_folder(file_name)
+    _create_log_folder(log_file_name)
 
     lg.basicConfig(
-        level=session_level,
-        filename=file_name,
-        format=DEFAULT_LOG_FORMAT
+        level=level,
+        filename=log_file_name,
+        format=log_format
     )
 
 
-def default_setup_logger():
+def setup_default_logger():
     """Quick and easy way to setup the logging.basicConfig
 
     level: ``lg.INFO``
     filename: ``exit_<YYYYMMDD>.log``
     format: ``%(asctime)s - %(name)s - %(levelname)s - %(message)s``
     """
-    today = dt.datetime.now().strftime("%Y%m%d")
+    log_file_name = _add_dynamic_date("exit.log")
     lg.basicConfig(
         level=lg.INFO,
-        filename=f"exit_{today}.log",
+        filename=log_file_name,
         format=DEFAULT_LOG_FORMAT
     )
 
@@ -191,8 +210,8 @@ def inject_logger(func: Callable[..., Any]) -> Callable[..., Any]:
     ----
     The decorated function must be designed to accept a 'logger' keyword
     argument. This implementation does not handle the case where the
-    function already has a 'logger' keyword argument or uses \*args and
-    \*\*kwargs in a way that conflicts with the automatic injection of the
+    function already has a 'logger' keyword argument or uses *args and
+    **kwargs in a way that conflicts with the automatic injection of the
     logger.
 
     Args
@@ -203,8 +222,7 @@ def inject_logger(func: Callable[..., Any]) -> Callable[..., Any]:
     Returns
     -------
     Callable
-        A wrapper function that adds the logger to ``func``'s 
-        arguments.
+        A wrapper function that adds the logger to ``func``'s arguments.
 
     Example:
         .. code-block:: python
@@ -241,8 +259,8 @@ def inject_named_logger(logger_name: Optional[str] = None):
     ----
     The decorated function must be designed to accept a 'logger' keyword
     argument. This implementation does not handle the case where the
-    function already has a 'logger' keyword argument or uses \*args and
-    \*\*kwargs in a way that conflicts with the automatic injection of the
+    function already has a 'logger' keyword argument or uses *args and
+    **kwargs in a way that conflicts with the automatic injection of the
     logger.
 
     Parameters
@@ -278,14 +296,3 @@ def inject_named_logger(logger_name: Optional[str] = None):
 
         return wrapper
     return decorator
-
-
-def _create_log_folder(file_name: str):
-    """This function checks if the log file name will be in a folder and wether
-    that folder exists, and creates the folder in the case it does not using
-    os.mkdirs()
-    """
-    assert file_name.endswith(".log")
-    if "/" in file_name:
-        log_folder = "/".join(file_name.split[:-1])
-        os.mkdirs(log_folder, exist_ok=True)

@@ -40,7 +40,7 @@ import logging as lg
 
 if __name__ == "__main__":
     args = l4d.set_log_args(return_args=True)
-    l4d.setup_logger(args)
+    l4d.setup_logger_from_args(args)
 
     lg.info("Setup complete")
 ```
@@ -75,7 +75,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Configure logging
-    l4d.setup_logger(args)
+    l4d.setup_logger_from_args(args)
 
     # Call the function without providing the logger manually
     my_data_processing_function(args.data)
