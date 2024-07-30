@@ -46,10 +46,11 @@ def setup_monitoring_args(
 
     Parameters
         parser : (argparse.ArgumentParser, None)
-            The parser to which the arguments are added. If None, a new parser will
-            be created.
+            The parser to which the arguments are added. If None, a new parser
+            will be created.
         return_args : (bool)
-            If True, parse the arguments and return the Namespace containing them.
+            If True, parse the arguments and return the Namespace containing
+            them.
 
     Returns
         argparse.Namespace or None
@@ -253,6 +254,7 @@ def setup_monitor_from_args(
     if return_monitor:
         return lg.getLogger(args.monitor_name)
     return None
+
 
 def inject_default_monitor(func: Callable[..., Any]) -> Callable[..., Any]:
     """
