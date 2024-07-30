@@ -58,6 +58,6 @@ def delete_old_log_files(log_dir: str = "logs", older_than: int = 30):
     # Loop through all files in the directory
     for file in log_path.iterdir():
         if file.is_file() and file.suffix == '.log':
-            parsed_date =  parse_date_from_filename(file)
+            parsed_date = parse_date_from_filename(file)
             if parsed_date is not None and parsed_date < cutoff_date:
                 file.unlink()
