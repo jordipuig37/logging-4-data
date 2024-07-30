@@ -45,21 +45,19 @@ def setup_monitoring_args(
     one is created. If ``return_args`` is True, parse and return the arguments.
 
     Parameters
-    ----------
-    parser : (argparse.ArgumentParser, None)
-        The parser to which the arguments are added. If None, a new parser will
-        be created.
-    return_args : (bool)
-        If True, parse the arguments and return the Namespace containing them.
+        parser : (argparse.ArgumentParser, None)
+            The parser to which the arguments are added. If None, a new parser will
+            be created.
+        return_args : (bool)
+            If True, parse the arguments and return the Namespace containing them.
 
     Returns
-    -------
-    argparse.Namespace or None
-        The Namespace containing parsed arguments if `return_args` is True
-        otherwise, None.
+        argparse.Namespace or None
+            The Namespace containing parsed arguments if `return_args` is True
+            otherwise, None.
 
-    Notes
-    -----
+    Note
+    ----
     The arguments added are:
 
     + ``--monitor-name`` (``-mtn``) [str]: The name of the monitor.
@@ -167,11 +165,11 @@ def setup_default_monitor(
     Optionally, the function returns the monitor object by setting
     return_monitor to True. You can also get the monitor in other scopes
     by calling ``logging.getLogger("monitor")``
-
     Default configurations are:
-        name: "monitor"
-        file: ``logs/monitoring_exit_<YYYYMMDD>.log``
-        log_level: ``logging.INFO``
+
+    + name: "monitor"
+    + file: ``logs/monitoring_exit_<YYYYMMDD>.log``
+    + log_level: ``logging.INFO``
     """
     monitor_name = DEFAULT_MONITOR_NAME
     monitor_file = DEFAULT_MONITOR_FILE
@@ -206,16 +204,15 @@ def setup_monitor(
     values
 
     Parameters
-    ----------
-    logger_name: (str)
-        The name of the MonitorLogger (subclass of Logger) object
-    level: (int)
-        Level at wich monitor logs will be shown
-    monitor_file: (str)
-        The file where logs will be stored
-    dynamic_date: (bool)
-        Whether to add the date suffix after the monitor_file, obtaining a file
-        like this: ``<monitor_file>_<YYYYMMDD>.log``
+        logger_name: (str)
+            The name of the MonitorLogger (subclass of Logger) object
+        level: (int)
+            Level at wich monitor logs will be shown
+        monitor_file: (str)
+            The file where logs will be stored
+        dynamic_date: (bool)
+            Whether to add the date suffix after the monitor_file, obtaining a
+            file like this: ``<monitor_file>_<YYYYMMDD>.log``
     """
     if monitor_name not in lg.Logger.manager.loggerDict:
         _ = _build_monitor_logger(
@@ -273,21 +270,20 @@ def inject_default_monitor(func: Callable[..., Any]) -> Callable[..., Any]:
     **kwargs in a way that conflicts with the automatic injection of the
     monitor.
 
-    Args
-    ----
-    func : (Callable)
-        The function to decorate.
+
+    Parameters
+        func : Callable
+            The function to decorate.
 
     Returns
-    -------
-    Callable
-        A wrapper function that adds the monitor to ``func``'s
-        arguments.
+        Callable
+            A wrapper function that adds the monitor to ``func``'s
+            arguments.
 
-    Example:
+    Example
         .. code-block:: python
 
-            @inject_default_monitor()
+            @inject_default_monitor
             def process_data(data, monitor=None):
                 monitor.info(
                     "Processing data",
@@ -319,28 +315,26 @@ def inject_named_monitor(monitor_name: str):
     automatically before calling the function. It retrieves a monitor instance
     using the passed argument monitor_name, which helps in tracking.
 
-    Notes
-    -----
-    1. The decorated function must be designed to accept a 'monitor' keyword
+    Note
+    ----
+    + The decorated function must be designed to accept a 'monitor' keyword
       argument. This implementation does not handle the case where the
       function already has a 'monitor' keyword argument or uses *args and
-      **kwargs in a way that conflicts with the automatic injection of the
+      *kwargs in a way that conflicts with the automatic injection of the
       logger.
-    2. The monitor must be initialized before injecting it. Else, the logger
-       returned will be a base lg.Logger object with the default configuration.
+    + The monitor must be initialized before injecting it. Else, the logger
+      returned will be a base lg.Logger object with the default configuration.
+
 
     Parameters
-    ----------
-    monitor_name : str
-        The name of the monitor to be used. Cant't be an empty string.
+        monitor_name : str
+            The name of the monitor to be used. Cant't be an empty string.
 
     Returns
-    -------
-    Callable
-        A wrapper function that adds the logger to ``func``'s arguments.
+        Callable
+            A wrapper function that adds the logger to ``func``'s arguments.
 
     Examples
-    --------
         .. code-block:: python
 
             @inject_named_monitor("my_monitor")

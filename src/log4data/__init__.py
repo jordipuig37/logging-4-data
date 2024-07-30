@@ -69,21 +69,20 @@ def setup_log_args(
     If ``return_args`` is True, parse and return the arguments.
 
     Parameters
-    ----------
-    parser : (argparse.ArgumentParser, None)
-        The parser to which the arguments are added. If None, a new parser will
-        be created.
-    return_args : (bool)
-        If True, parse the arguments and return the Namespace containing them.
+        parser : Optional[argparse.ArgumentParser] default None
+            The parser to which the arguments are added. If None, a new parser
+            will be created.
+        return_args : (bool) default False
+            If True, parse the arguments and return the Namespace containing
+            them.
 
     Returns
-    -------
-    argparse.Namespace or None
-        The Namespace containing parsed arguments if `return_args` is True
-        otherwise, None.
+        Optional[argparse.Namespace]
+            The Namespace containing parsed arguments if `return_args` is True
+            otherwise, None.
 
-    Notes
-    -----
+    Note
+    ----
     The arguments added are:
 
     + ``--log-level`` (``-lglv``) [str]: Level at which logs will be shown.
@@ -134,7 +133,6 @@ def setup_logger_from_args(args: argparse.Namespace):
     + ``args.add_dynamic_date``
 
     Parameters
-    ----------
         args : (argparse.Namespace)
     """
     session_level = log_levels_lookup.get(args.log_level.lower(), lg.INFO)
@@ -163,12 +161,11 @@ def setup_logger(
     ``%(asctime)s - %(name)s - %(levelname)s - %(message)s``
 
     Parameters
-    ----------
-    log_file_name : (str)
-        Sets the file where logs will be written to.
-    dynamic_date : (bool)
-        If True the name will be altered to add the date and result in a name
-        like this: ``<log_file_name>_<YYYYMMDD>.log``
+        log_file_name : (str)
+            Sets the file where logs will be written to.
+        dynamic_date : (bool)
+            If True the name will be altered to add the date and result in a
+            name like this: ``<log_file_name>_<YYYYMMDD>.log``
     """
     if dynamic_date:
         log_file_name = _add_dynamic_date(log_file_name)
@@ -185,9 +182,9 @@ def setup_logger(
 def setup_default_logger():
     """Quick and easy way to setup the logging.basicConfig
 
-    level: ``lg.INFO``
-    filename: ``exit_<YYYYMMDD>.log``
-    format: ``%(asctime)s - %(name)s - %(levelname)s - %(message)s``
+    + level: ``lg.INFO``
+    + filename: ``exit_<YYYYMMDD>.log``
+    + format: ``%(asctime)s - %(name)s - %(levelname)s - %(message)s``
     """
     log_file_name = _add_dynamic_date("exit.log")
     lg.basicConfig(
@@ -208,23 +205,23 @@ def inject_logger(func: Callable[..., Any]) -> Callable[..., Any]:
 
     Note
     ----
-    The decorated function must be designed to accept a 'logger' keyword
+    The decorated function must be designed to accept a ``logger`` keyword
     argument. This implementation does not handle the case where the
-    function already has a 'logger' keyword argument or uses *args and
+    function already has a ``logger`` keyword argument or uses *args and
     **kwargs in a way that conflicts with the automatic injection of the
     logger.
 
-    Args
-    ----
-    func : (Callable)
-        The function to decorate.
+
+    Parameters
+        func : (Callable[..., Any])
+            The function to decorate.
+
 
     Returns
-    -------
-    Callable
-        A wrapper function that adds the logger to ``func``'s arguments.
+        Callable
+            A wrapper function that adds the logger to ``func`` 's arguments.
 
-    Example:
+    Example
         .. code-block:: python
 
             @inject_logger()
@@ -255,27 +252,26 @@ def inject_named_logger(logger_name: Optional[str] = None):
     automatically before calling the function. It retrieves a logger instance
     using the passed argument logger_name, which helps in tracking.
 
+
     Note
     ----
-    The decorated function must be designed to accept a 'logger' keyword
+    The decorated function must be designed to accept a ``logger`` keyword
     argument. This implementation does not handle the case where the
-    function already has a 'logger' keyword argument or uses *args and
+    function already has a ``logger`` keyword argument or uses *args and
     **kwargs in a way that conflicts with the automatic injection of the
     logger.
 
+
     Parameters
-    ----------
-    logger_name : (Optional[str])
-        If logger_name is not None, the logger
-        will have this name. Else the name will be root.
+        logger_name : (Optional[str])
+            If logger_name is not None, the logger
+            will have this name. Else the name will be root.
 
     Returns
-    -------
-    Callable
-        A wrapper function that adds the logger to ``func`` 's arguments.
+        Callable
+            A wrapper function that adds the logger to ``func`` 's arguments.
 
-    Examples
-    --------
+    Example
         .. code-block:: python
 
             @inject_named_logger("my_logger")
