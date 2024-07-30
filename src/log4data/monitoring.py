@@ -30,6 +30,7 @@ def _initialize_log_headers(filename: str):
     if not os.path.exists(filename):
         with open(filename, "w") as lgf:
             lgf.write(header)
+            lgf.write("\n")
 
 
 def setup_monitoring_args(
