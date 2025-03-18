@@ -39,6 +39,7 @@ __all__ = [
     "setup_default_logger",
     "setup_logger",
     "setup_logger_from_args",
+    "get_stream_logger",
     "inject_logger",
     "inject_named_logger",
     # MONITORING
@@ -292,3 +293,31 @@ def inject_named_logger(logger_name: Optional[str] = None):
 
         return wrapper
     return decorator
+
+
+def get_stream_logger(
+        level: int = lg.INFO,
+        log_format: str = DEFAULT_LOG_FORMAT) -> lg.Logger:
+    """
+    Setup logging to make beautiful logging in notebooks or in the terminal.
+
+    This function returns a logger object that will print everything to the
+    stream output. This is meant to be used in notebooks or in scripts ran from
+    the terminal.
+
+    Parameters:
+        level : (int)
+            The logging level, default lg.INFO
+        log_format : (str)
+            The format of the messages. Set by default.
+    """
+    logger = lg.getLogger("main")
+    logger.propagate = False  # removes the link to the root logger
+    logger.setLevel(level)
+    stream_handler = lg.StreamHandler()
+    stream_handler.setFormatter(lg.Formatter(log_format))
+    logger.handlers = [stream_handler]
+
+    logger.info(f"Logger is initialized with level: lg.{lg.getLevelName(level)}")
+
+    return logger
