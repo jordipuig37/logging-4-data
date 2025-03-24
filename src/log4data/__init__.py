@@ -305,11 +305,11 @@ def get_stream_logger(
     stream output. This is meant to be used in notebooks or in scripts ran from
     the terminal.
 
-    Parameters:
+    Parameters
         level : (int)
-            The logging level, default lg.INFO
+            The logging level, default `lg.INFO`
         log_format : (str)
-            The format of the messages. Set by default.
+            The format of the messages. Set by default to library standard.
     """
     logger = lg.getLogger("main")
     logger.propagate = False  # removes the link to the root logger
