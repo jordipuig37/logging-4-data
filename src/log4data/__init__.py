@@ -311,13 +311,15 @@ def get_stream_logger(
         log_format : (str)
             The format of the messages. Set by default to library standard.
     """
-    logger = lg.getLogger("main")
+    logger = lg.getLogger(__name__)
     logger.propagate = False  # removes the link to the root logger
     logger.setLevel(level)
     stream_handler = lg.StreamHandler()
     stream_handler.setFormatter(lg.Formatter(log_format))
     logger.handlers = [stream_handler]
 
-    logger.info(f"Logger is initialized with level: lg.{lg.getLevelName(level)}")
+    logger.info(
+        f"Logger is initialized with level: lg.{lg.getLevelName(level)}"
+    )
 
     return logger
