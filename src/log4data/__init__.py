@@ -110,9 +110,8 @@ def setup_log_args(
     )
     parser.add_argument(
         "-add", "--add-dynamic-date",
-        type=bool, action="store_true", default=True,
+        action="store_true", default=True,
         help="Add the date to the log file name: <filename>_<YYYYMMDD>.log"
-
     )
 
     if return_args:  # return the parsed arguments
