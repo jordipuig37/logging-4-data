@@ -36,7 +36,7 @@ jobs:
       - name: Check if version exists on PyPI/TestPyPI
         id: check_published
         run: |
-          PACKAGE_NAME="your_package_name_here"
+          PACKAGE_NAME="log4data"
           VERSION=${{ steps.get_version.outputs.version }}
 
           if [ "${{ github.ref_name }}" = "main" ]; then
