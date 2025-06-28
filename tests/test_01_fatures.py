@@ -118,11 +118,10 @@ class TestSetupDefaultLogger:
     def log_file_path(self):
         self.log_file = "exit_20250101.log"
 
-    def test_setup_default_logger_creates_log_file(self, monkeypatch):
+    def test_setup_default_logger_creates_log_file(self):
         clean_root_logger()
         l4d.setup_default_logger()
         lg.info("default logger test")
 
         assert os.path.exists(self.log_file), \
             f"File {self.log_file} doesn't exist."
-        assert os.path.exists(self.log_file)
