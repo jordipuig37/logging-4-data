@@ -2,8 +2,7 @@ import sys
 import os
 import logging as lg
 import argparse
-import tempfile
-import shutil
+import datetime as dt
 import types
 import pytest
 from freezegun import freeze_time
@@ -11,6 +10,7 @@ from freezegun import freeze_time
 import log4data as l4d
 
 import argparse
+from typing import Final
 
 
 def clean_root_logger():
@@ -111,18 +111,20 @@ class TestSetupLogger:
             f"File {self.log_file} doesn't exist."
 
 
+FIX_DAY: Final = dt.datetime(2025, 1, 1)
+
+
+@pytest.fixture
+def fix_day_log_file():
+    return "exit_20250101.log"
+
+
 @freeze_time("2025-01-01 12:00:00")
 class TestSetupDefaultLogger:
-    @pytest.fixture(autouse=True)
-    def fix_day_log_file_path(self):
-        """Sets the log file name according to `freeze_time` to 2025-01-01
-        """
-        self.fix_day_log_file = "exit_20250101.log"
-
-    def test_setup_default_logger_creates_log_file(self):
+    def test_setup_default_logger_creates_log_file(self, fix_day_log_file):
         clean_root_logger()
         l4d.setup_default_logger()
         lg.info("default logger test")
 
-        assert os.path.exists(self.fix_day_log_file), \
-            f"File {self.fix_day_log_file} doesn't exist."
+        assert os.path.exists(fix_day_log_file), \
+            f"File {fix_day_log_file} doesn't exist."
