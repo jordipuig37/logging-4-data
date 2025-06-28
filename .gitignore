@@ -35,4 +35,5 @@ venv
 TODO.md
 
 # Coverage report
+.coverage
 coverage.xml
