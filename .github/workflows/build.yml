@@ -26,7 +26,36 @@ jobs:
       - name: Build package
         run: python -m build
 
+      - name: Extract version
+        id: get_version
+        run: |
+          VERSION=$(grep '^version' pyproject.toml | head -1 | cut -d '"' -f2)
+          echo "Version: $VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Check if version exists on PyPI/TestPyPI
+        id: check_published
+        run: |
+          PACKAGE_NAME="your_package_name_here"
+          VERSION=${{ steps.get_version.outputs.version }}
+
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            PYPI_URL="https://pypi.org/pypi/$PACKAGE_NAME/json"
+          else
+            PYPI_URL="https://test.pypi.org/pypi/$PACKAGE_NAME/json"
+          fi
+
+          if curl --silent $PYPI_URL | grep -q "\"$VERSION\""; then
+            echo "Version $VERSION already exists"
+            echo "published=true" >> $GITHUB_OUTPUT
+          else
+            echo "Version $VERSION not published"
+            echo "published=false" >> $GITHUB_OUTPUT
+          fi
+
+
       - name: Publish to PyPI or Test PyPI
+        if: steps.check_published.outputs.published == 'false'
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
