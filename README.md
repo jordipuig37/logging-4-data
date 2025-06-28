@@ -1,6 +1,6 @@
 # Logging for Data Pipelines
 
-![Build](https://github.com/jordipuig37/logging-4-data/actions/workflows/tests.yml/badge.svg)
+![Tests](https://github.com/jordipuig37/logging-4-data/actions/workflows/validation.yml/badge.svg)
 [![Coverage](https://codecov.io/gh/jordipuig37/logging-4-data/branch/main/graph/badge.svg)](https://codecov.io/gh/jordipuig37/logging-4-data)
 [![PyPI](https://img.shields.io/pypi/v/log4data)](https://pypi.org/project/log4data/)
 ![License](https://img.shields.io/github/license/jordipuig37/logging-4-data)
