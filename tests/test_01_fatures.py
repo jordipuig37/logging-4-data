@@ -76,7 +76,7 @@ class TestSetupLogArgs:
 
 class TestSetupLoggerFromArgs:
     @pytest.fixture(autouse=True)
-    def input_args(self, tmp_path):
+    def input_args(self):
         self.args = types.SimpleNamespace(
             log_level="info",
             log_file_name="tmp/TestSetupLoggerFromArgs.log",
@@ -88,7 +88,7 @@ class TestSetupLoggerFromArgs:
         clean_root_logger()
         l4d.setup_logger_from_args(self.args)
         lg.info("from test_setup_logger_from_args_creates_log_file")
-        # import pdb; pdb.set_trace()
+
         assert os.path.exists(self.args.log_file_name), \
             f"File {self.args.log_file_name} doesn't exist."
 
@@ -109,19 +109,20 @@ class TestSetupLogger:
 
         assert os.path.exists(self.log_file), \
             f"File {self.log_file} doesn't exist."
-    # [ ] build tests to check other stuff too
 
 
 @freeze_time("2025-01-01 12:00:00")
 class TestSetupDefaultLogger:
     @pytest.fixture(autouse=True)
-    def log_file_path(self):
-        self.log_file = "exit_20250101.log"
+    def fix_day_log_file_path(self):
+        """Sets the log file name according to `freeze_time` to 2025-01-01
+        """
+        self.fix_day_log_file = "exit_20250101.log"
 
     def test_setup_default_logger_creates_log_file(self):
         clean_root_logger()
         l4d.setup_default_logger()
         lg.info("default logger test")
 
-        assert os.path.exists(self.log_file), \
-            f"File {self.log_file} doesn't exist."
+        assert os.path.exists(self.fix_day_log_file), \
+            f"File {self.fix_day_log_file} doesn't exist."
