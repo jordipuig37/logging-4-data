@@ -1,5 +1,12 @@
 # Logging for Data Pipelines
 
+![Tests](https://github.com/jordipuig37/logging-4-data/actions/workflows/validation.yml/badge.svg)
+[![Coverage](https://codecov.io/gh/jordipuig37/logging-4-data/branch/main/graph/badge.svg)](https://codecov.io/gh/jordipuig37/logging-4-data)
+[![PyPI](https://img.shields.io/pypi/v/log4data)](https://pypi.org/project/log4data/)
+![License](https://img.shields.io/github/license/jordipuig37/logging-4-data)
+![Python Versions](https://img.shields.io/pypi/pyversions/log4data)
+
+
 This library simplifies the logging setup process for new data pipelines, eliminating the need to repeatedly look up logger configurations.
 
 ## Installation

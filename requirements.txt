@@ -5,3 +5,5 @@ pytest
 twine
 sphinx
 pandas
+freezegun
+pytest-cov

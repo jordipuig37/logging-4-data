@@ -33,3 +33,7 @@ venv
 
 # ignore working notes and todos
 TODO.md
+
+# Coverage report
+.coverage
+coverage.xml
