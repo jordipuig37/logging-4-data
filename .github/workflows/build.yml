@@ -55,7 +55,7 @@ jobs:
 
 
       - name: Publish to PyPI or Test PyPI
-        if: steps.check_published.outputs.published == 'false'
+        if: steps.check_published.outputs.published == 'true'
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
